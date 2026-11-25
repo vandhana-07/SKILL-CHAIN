@@ -164,7 +164,7 @@ public class LoginRegisterFrame extends JFrame {
 
         gbc.insets = new Insets(3, 6, 2, 6);
         card.add(label("STUDENT EMAIL", UITheme.FONT_BODY_BOLD, UITheme.COLOR_TEXT_PRIMARY), at(gbc, row++));
-        txtRegEmail = new ModernTextField("e.g. student@university.edu");
+        txtRegEmail = new ModernTextField("e.g. vandhana.m.2025.ece@rajalakshmi.edu.in");
         gbc.insets = new Insets(1, 6, 7, 6);
         card.add(txtRegEmail, at(gbc, row++));
 

@@ -9,6 +9,7 @@ import com.skillchain.util.PasswordUtil;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * ============================================================================
@@ -18,6 +19,9 @@ import java.util.Optional;
  * verification before passing control to the DAO layer.
  */
 public class UserService {
+
+    private static final Pattern STUDENT_EMAIL_PATTERN = Pattern.compile(
+            "(?i)^[a-z]+\\.[a-z]\\.\\d{4}\\.[a-z]+@rajalakshmi\\.edu\\.in$");
 
     private final UserDao userDao;
 
@@ -48,8 +52,11 @@ public class UserService {
         if (name == null || name.trim().length() < 2) {
             throw new IllegalArgumentException("Full name must be at least 2 characters.");
         }
-        if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new IllegalArgumentException("Please enter a valid email address (e.g., student@university.edu).");
+        String normalizedEmail = email == null ? "" : email.trim();
+        if (!STUDENT_EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            throw new IllegalArgumentException(
+                    "Email must follow name.initial.year.department@rajalakshmi.edu.in " +
+                    "(for example, vandhana.m.2025.ece@rajalakshmi.edu.in).");
         }
         if (password == null || password.length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters long.");
@@ -59,8 +66,8 @@ public class UserService {
         }
 
         // Check if email already exists
-        if (userDao.existsByEmail(email)) {
-            throw new DuplicateEmailException("An account with email '" + email.trim() + "' already exists.");
+        if (userDao.existsByEmail(normalizedEmail)) {
+            throw new DuplicateEmailException("An account with email '" + normalizedEmail + "' already exists.");
         }
 
         // A unique random salt and a deliberately slow PBKDF2 hash are stored.
@@ -69,7 +76,7 @@ public class UserService {
 
         User newUser = new User();
         newUser.setName(name.trim());
-        newUser.setEmail(email.trim().toLowerCase());
+        newUser.setEmail(normalizedEmail.toLowerCase());
         newUser.setPasswordHash(passwordHash);
         newUser.setSalt(salt);
 

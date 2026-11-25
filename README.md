@@ -13,6 +13,7 @@ Alice can teach Java and wants to learn Python. Bob can teach Python and wants t
 ## What students can do
 
 - Create an account and manage a personal skill portfolio.
+- Register with the college email structure `name.initial.year.department@rajalakshmi.edu.in`.
 - Add skills to teach or skills to learn, organized by category.
 - Browse the campus directory with confirmed reciprocal matches highlighted first, including the exact skill pair that makes each match two-way.
 - Send learning requests and follow their pending, accepted, or rejected status.
