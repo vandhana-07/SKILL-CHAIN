@@ -14,7 +14,7 @@ Alice can teach Java and wants to learn Python. Bob can teach Python and wants t
 
 - Create an account and manage a personal skill portfolio.
 - Add skills to teach or skills to learn, organized by category.
-- Browse the campus directory and find reciprocal skill matches.
+- Browse the campus directory with confirmed reciprocal matches highlighted first, including the exact skill pair that makes each match two-way.
 - Send learning requests and follow their pending, accepted, or rejected status.
 - Review incoming and outgoing requests and see in-app notifications.
 
@@ -30,7 +30,7 @@ flowchart LR
     Match --> DB
 ```
 
-The matching query checks both sides of a potential exchange: a student's teaching skill must be something the peer wants, and the peer's teaching skill must be something the student wants. The result comes from the stored student and skill records.
+The matching query checks both sides of a potential exchange: a student's teaching skill must be something the peer wants, and the peer's teaching skill must be something the student wants. The directory labels and prioritizes students who meet both conditions, and shows the skill pair that explains each match. The result comes from the stored student and skill records.
 
 ## Java and OOP in the project
 

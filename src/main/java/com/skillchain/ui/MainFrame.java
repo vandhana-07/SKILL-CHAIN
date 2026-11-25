@@ -85,6 +85,7 @@ public class MainFrame extends JFrame {
     private JLabel lblMatchesCount;
     private ModernTextField txtSearchMatches;
     private List<ReciprocalMatch> cachedMatches = new ArrayList<>();
+    private boolean matchDataLoaded;
 
     // Requests UI
     private JTable tblIncomingRequests;
@@ -915,7 +916,7 @@ public class MainFrame extends JFrame {
         lblHeading.setFont(UITheme.FONT_TITLE);
         lblHeading.setForeground(new Color(15, 23, 42));
 
-        JLabel lblSub = new JLabel("Browse student emails and click 'Send Request ✉' directly next to their email.");
+        JLabel lblSub = new JLabel("Green match labels show two-way skill fits; matching students appear first in the directory.");
         lblSub.setFont(UITheme.FONT_BODY);
         lblSub.setForeground(new Color(100, 116, 139));
 
@@ -939,7 +940,7 @@ public class MainFrame extends JFrame {
         subTabs.addTab("  Student Emails & Send Request  ", dirPanel);
 
         // Sub Tab 2: Smart Reciprocal Matches
-        subTabs.addTab("  Smart Reciprocal Matches  ", createReciprocalMatchesSubPanel());
+        subTabs.addTab("  Perfect Reciprocal Matches  ", createReciprocalMatchesSubPanel());
 
         panel.add(subTabs, BorderLayout.CENTER);
         return panel;
@@ -967,7 +968,7 @@ public class MainFrame extends JFrame {
             searchControls.add(txtSearchPeers);
             toolbar.add(searchControls, BorderLayout.WEST);
         } else {
-            JLabel lblInstruction = new JLabel("Click 'Send Request' next to any student's email to propose an exchange:");
+            JLabel lblInstruction = new JLabel("Perfect reciprocal matches are highlighted first. You can still contact any classmate:");
             lblInstruction.setFont(UITheme.FONT_BODY_BOLD);
             lblInstruction.setForeground(new Color(30, 58, 138));
             toolbar.add(lblInstruction, BorderLayout.WEST);
@@ -1007,7 +1008,7 @@ public class MainFrame extends JFrame {
         JPanel leftStatus = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         leftStatus.setOpaque(false);
 
-        lblMatchesCount = new JLabel("Mutual Matches: 0");
+        lblMatchesCount = new JLabel("Perfect two-way matches: 0");
         lblMatchesCount.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblMatchesCount.setForeground(new Color(5, 150, 105));
 
@@ -1881,6 +1882,13 @@ public class MainFrame extends JFrame {
     private void loadPeerDirectory() {
         try {
             cachedPeerStudents = requestService.getPeerDirectory(currentUser.getId());
+            try {
+                cachedMatches = matchingService.findReciprocalMatches(currentUser.getId());
+                matchDataLoaded = true;
+            } catch (SQLException matchError) {
+                cachedMatches = new ArrayList<>();
+                matchDataLoaded = false;
+            }
             if (peerCardsContainer != null) {
                 renderStudentEmailCards(peerCardsContainer, txtSearchPeers != null ? txtSearchPeers.getText() : "");
             }
@@ -1918,6 +1926,12 @@ public class MainFrame extends JFrame {
             }
         }
 
+        // Put confirmed two-way skill fits first so students do not have to
+        // compare every teaching and learning list by hand.
+        filtered.sort((left, right) -> Boolean.compare(
+                getMatchesForPeer(left.getUserId()).isEmpty(),
+                getMatchesForPeer(right.getUserId()).isEmpty()));
+
         if (filtered.isEmpty()) {
             JPanel emptyCard = new JPanel(new FlowLayout(FlowLayout.CENTER));
             emptyCard.setOpaque(false);
@@ -1944,9 +1958,9 @@ public class MainFrame extends JFrame {
                 new LineBorder(new Color(226, 232, 240), 1),
                 new EmptyBorder(14, 18, 14, 18)
         ));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 142));
-        card.setPreferredSize(new Dimension(850, 130));
-        card.setMinimumSize(new Dimension(450, 120));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 182));
+        card.setPreferredSize(new Dimension(850, 166));
+        card.setMinimumSize(new Dimension(450, 156));
 
         // 1. Left Avatar circle with initials
         String initials = getInitials(p.getName());
@@ -2052,16 +2066,84 @@ public class MainFrame extends JFrame {
         skillsRow.add(teachBadge);
         skillsRow.add(learnBadge);
 
+        JPanel matchRow = createMatchSummary(p);
+
         centerInfo.add(nameRow);
         centerInfo.add(Box.createRigidArea(new Dimension(0, 5)));
         centerInfo.add(emailActionRow);
         centerInfo.add(Box.createRigidArea(new Dimension(0, 6)));
         centerInfo.add(skillsRow);
+        centerInfo.add(Box.createRigidArea(new Dimension(0, 5)));
+        centerInfo.add(matchRow);
 
         card.add(avatarWrapper, BorderLayout.WEST);
         card.add(centerInfo, BorderLayout.CENTER);
 
         return card;
+    }
+
+    private List<ReciprocalMatch> getMatchesForPeer(int peerId) {
+        List<ReciprocalMatch> peerMatches = new ArrayList<>();
+        for (ReciprocalMatch match : cachedMatches) {
+            if (match.getMatchedUserId() == peerId) {
+                peerMatches.add(match);
+            }
+        }
+        return peerMatches;
+    }
+
+    private JPanel createMatchSummary(PeerStudent peer) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+        row.setOpaque(false);
+
+        List<ReciprocalMatch> matches = getMatchesForPeer(peer.getUserId());
+        String badgeText;
+        String explanation;
+        Color badgeBackground;
+        Color badgeForeground;
+        Color badgeBorder;
+
+        if (!matchDataLoaded) {
+            badgeText = "Match status unavailable";
+            explanation = "Refresh the directory to check the two-way fit.";
+            badgeBackground = new Color(241, 245, 249);
+            badgeForeground = new Color(71, 85, 105);
+            badgeBorder = new Color(203, 213, 225);
+        } else if (matches.isEmpty()) {
+            badgeText = "No exact reciprocal match yet";
+            explanation = "A two-way match needs both skills to fit.";
+            badgeBackground = new Color(248, 250, 252);
+            badgeForeground = new Color(71, 85, 105);
+            badgeBorder = new Color(226, 232, 240);
+        } else {
+            ReciprocalMatch match = matches.get(0);
+            badgeText = "Perfect reciprocal match";
+            explanation = "You teach " + match.getUserOfferedSkillName()
+                    + "; they teach " + match.getPartnerOfferedSkillName()
+                    + " — each wants the other's skill";
+            if (matches.size() > 1) {
+                explanation += " · " + matches.size() + " skill pair options";
+            }
+            badgeBackground = new Color(236, 253, 245);
+            badgeForeground = new Color(5, 150, 105);
+            badgeBorder = new Color(167, 243, 208);
+        }
+
+        JLabel badge = new JLabel(badgeText);
+        badge.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        badge.setForeground(badgeForeground);
+        badge.setOpaque(true);
+        badge.setBackground(badgeBackground);
+        badge.setBorder(new CompoundBorder(
+                new LineBorder(badgeBorder, 1, true),
+                new EmptyBorder(2, 7, 2, 7)));
+
+        JLabel detail = new JLabel(explanation);
+        detail.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        detail.setForeground(new Color(71, 85, 105));
+        row.add(badge);
+        row.add(detail);
+        return row;
     }
 
     private void loadUserSkillsData() {
@@ -2142,9 +2224,14 @@ public class MainFrame extends JFrame {
     private void loadReciprocalMatches() {
         try {
             cachedMatches = matchingService.findReciprocalMatches(currentUser.getId());
+            matchDataLoaded = true;
             displayMatchesInTable(cachedMatches);
             lblDashMatches.setText(String.valueOf(cachedMatches.size()));
+            if (peerCardsContainer != null) {
+                renderStudentEmailCards(peerCardsContainer, txtSearchPeers != null ? txtSearchPeers.getText() : "");
+            }
         } catch (SQLException e) {
+            matchDataLoaded = false;
             JOptionPane.showMessageDialog(this,
                     "Failed to calculate reciprocal matches: " + e.getMessage(),
                     "Matching Engine Error",
@@ -2179,7 +2266,7 @@ public class MainFrame extends JFrame {
                     m.getPartnerOfferedSkillName() + " (" + m.getPartnerOfferedCategory() + ")"
             });
         }
-        lblMatchesCount.setText("Mutual Matches: " + matches.size());
+        lblMatchesCount.setText("Perfect two-way matches: " + matches.size());
     }
 
     private void handleSendSwapInvitation() {
