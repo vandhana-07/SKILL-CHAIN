@@ -1,0 +1,242 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Skill Chain Final Project Report</title>
+<style>body{max-width:900px;margin:3rem auto;padding:0 1.5rem;font:16px/1.55 Georgia,serif;color:#171717}h1,h2,h3{font-family:Arial,sans-serif;color:#111;line-height:1.2}h1{font-size:2rem}h2{font-size:1.55rem;margin-top:2.5rem}h3{font-size:1.15rem;margin-top:1.6rem}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ccd1d5;padding:.45rem .55rem;text-align:left;vertical-align:top}th{background:#edf0f3}pre{white-space:pre-wrap;background:#f2f4f5;padding:1rem}img{max-width:100%;height:auto;display:block;margin:1rem auto}code{background:#f2f4f5;padding:.1rem .25rem}</style></head><body>
+<h1>Skill Chain Final Project Report</h1>
+<h2>Integrated Java OOP and DBMS Project</h2>
+<p><strong>Project:</strong> Campus Peer-to-Peer Skill Exchange Platform</p>
+<p><strong>Institution:</strong> Rajalakshmi Engineering College</p>
+<p><strong>Department:</strong> ______________________________</p>
+<p><strong>Academic year:</strong> ______________________________</p>
+<p><strong>Team members and register numbers:</strong></p>
+<ol>
+<li>____________________________________________</li>
+<li>____________________________________________</li>
+<li>____________________________________________</li>
+</ol>
+<h2>Bonafide Certificate</h2>
+<p>This is to certify that the project titled <strong>Skill Chain: Campus Peer-to-Peer Skill Exchange Platform</strong> is the work of the students named above, submitted in partial fulfilment of the requirements for the course project in Object-Oriented Programming and Database Management Systems during the academic year stated above.</p>
+<p><strong>Project guide:</strong> ______________________________</p>
+<p><strong>Head of department:</strong> _________________________</p>
+<p><strong>Date:</strong> __________________  <strong>Place:</strong> __________________</p>
+<h2>Student Declaration</h2>
+<p>We declare that this project report describes the Java and MySQL application developed by our team. The implementation details and verification status in this report are based on the files and checks identified in the report. Any remaining live database checks are marked as pending.</p>
+<p><strong>Student signatures:</strong></p>
+<ol>
+<li>__________________________  2. __________________________  3. __________________________</li>
+</ol>
+<h2>Acknowledgement</h2>
+<p>We express our gratitude to ______________________________ for guidance during this project and to the Department of ______________________________ for providing the opportunity to complete it.</p>
+<h2>Abstract</h2>
+<p>Skill Chain is a Java Swing desktop application that helps campus students find peers for no-cost, two-way skill exchange. A student records the skills they can teach and the skills they want to learn. The application searches for another student whose teaching and learning interests complete that exchange, then lets the students manage a proposal as a learning request.</p>
+<p>The application uses Java 17, JDBC, and MySQL. Its four relational tables store users, the skill catalogue, user-to-skill associations, and exchange requests. Primary keys, foreign keys, uniqueness constraints, checks, and indexes protect data relationships. Java packages separate the user interface, service logic, DAO contracts and implementations, domain models, and utilities. The code demonstrates encapsulation, abstraction, inheritance, method overriding and overloading, custom exception handling, and JDBC CRUD operations.</p>
+<p>The Java sources compile with JDK 17, and the database-independent OOP smoke check passes after the current password-hash changes. Live MySQL integration cases still require execution against a configured local server; the test plan records those cases as pending rather than treating them as passed.</p>
+<h2>Table of Contents</h2>
+<ol>
+<li>Chapter 1: Introduction</li>
+<li>Chapter 2: Requirements and Feasibility</li>
+<li>Chapter 3: System Analysis and Design</li>
+<li>Chapter 4: Database Design</li>
+<li>Chapter 5: Implementation</li>
+<li>Chapter 6: Verification and Test Plan</li>
+<li>Chapter 7: Security, Limitations, and Maintenance</li>
+<li>Chapter 8: Conclusion and Future Work</li>
+<li>References</li>
+<li>Appendix A: SQL Schema</li>
+<li>Appendix B: Output Screenshots</li>
+</ol>
+<h2>Chapter 1: Introduction</h2>
+<h3>1.1 Background</h3>
+<p>Students often want help with a subject or tool that another student already knows. Informal requests in class groups are difficult to search, and they do not show whether the other student also wants to learn a skill in return. Skill Chain organizes those interests in one searchable desktop application.</p>
+<h3>1.2 Problem Statement</h3>
+<p>Students need a simple way to find a campus peer who can teach a skill they want to learn and who is also interested in learning something the first student can teach. The system must store these portfolios, find mutual matches, and record proposals without losing referential integrity.</p>
+<h3>1.3 Objectives</h3>
+<ul>
+<li>Register and authenticate student accounts.</li>
+<li>Maintain a student portfolio of skills to teach and skills to learn.</li>
+<li>Search the skill catalogue and the campus directory.</li>
+<li>Find reciprocal teaching and learning pairs from stored portfolio data.</li>
+<li>Create, view, accept, and reject exchange requests.</li>
+<li>Demonstrate Java OOP concepts alongside relational DBMS operations.</li>
+</ul>
+<h3>1.4 Scope</h3>
+<p>Skill Chain is a local desktop project for demonstrating a campus skill exchange workflow. It is not a public web service or a production deployment. MySQL credentials are configured on the machine running the application.</p>
+<h2>Chapter 2: Requirements and Feasibility</h2>
+<h3>2.1 Functional Requirements</h3>
+<table><thead><tr><th>ID</th><th>Requirement</th></tr></thead><tbody>
+<tr><td>FR1</td><td>A student can register and log in using an email and password.</td></tr>
+<tr><td>FR2</td><td>A student can add, list, search, and remove skills from their portfolio.</td></tr>
+<tr><td>FR3</td><td>A student can view a peer directory and their reciprocal matches.</td></tr>
+<tr><td>FR4</td><td>A student can send an exchange proposal and view incoming or outgoing requests.</td></tr>
+<tr><td>FR5</td><td>The addressed receiver can accept or reject a pending request.</td></tr>
+<tr><td>FR6</td><td>The dashboard can show portfolio counts, reciprocal matches, and request information.</td></tr>
+</tbody></table>
+<h3>2.2 Non-Functional Requirements</h3>
+<ul>
+<li>Store relational data in MySQL and access it through JDBC.</li>
+<li>Use prepared statements and close JDBC resources reliably.</li>
+<li>Preserve referential integrity between users, skills, portfolios, and requests.</li>
+<li>Keep passwords out of the database in plaintext.</li>
+<li>Present the workflow in a desktop interface that runs on JDK 17 or later.</li>
+</ul>
+<h3>2.3 Feasibility</h3>
+<p><strong>Technical:</strong> Java Swing, JDBC, and MySQL satisfy the project requirements and run on a standard JDK 17 workstation with MySQL 8.0.</p>
+<p><strong>Operational:</strong> The workflow uses familiar registration, portfolio, match, and request screens. Students can demonstrate it with the seeded accounts.</p>
+<p><strong>Economic:</strong> The project uses the JDK, MySQL Community Server, and MySQL Connector/J; it does not require a paid service for a local demonstration.</p>
+<h3>2.4 Environment</h3>
+<table><thead><tr><th>Component</th><th>Requirement</th></tr></thead><tbody>
+<tr><td>Language/runtime</td><td>Java 17 or later</td></tr>
+<tr><td>User interface</td><td>Java Swing</td></tr>
+<tr><td>Database</td><td>MySQL 8.0 or later</td></tr>
+<tr><td>Connectivity</td><td>JDBC with MySQL Connector/J 8.4.0</td></tr>
+<tr><td>Build</td><td>Maven, or the provided Windows batch scripts</td></tr>
+</tbody></table>
+<h2>Chapter 3: System Analysis and Design</h2>
+<h3>3.1 Architecture</h3>
+<p>The desktop interface sends user actions to service classes. Services apply project rules and call DAO interfaces. JDBC DAO implementations use prepared statements to read or change MySQL rows. Domain models carry the resulting user, skill, and request data back to the interface.</p>
+<pre><code>Student
+  |
+  v
+Swing UI (ui) -&gt; Service layer (service) -&gt; DAO contracts (dao)
+                                            |
+                                            v
+                                   JDBC DAO implementations
+                                            |
+                                            v
+                                       MySQL schema
+
+Domain objects (model) are passed between the UI, services, and DAOs.
+Utilities (util) provide connection configuration, password hashing,
+and application-specific exceptions.</code></pre>
+<h3>3.2 Main Workflows</h3>
+<p><strong>Registration and login:</strong> The UI validates the form, the service validates the input and derives a password hash, and the user DAO stores or retrieves the account. A successful login opens the main application window.</p>
+<p><strong>Portfolio and matching:</strong> A student adds <code>TEACH</code> and <code>LEARN</code> rows. The matching service joins those records to another student&#x27;s portfolio and returns pairs only when the teaching and learning interests overlap in both directions.</p>
+<p><strong>Exchange request:</strong> A student sends a proposal. The receiver can accept or reject it while it is pending. The update is constrained by both the request ID and the authenticated receiver&#x27;s user ID.</p>
+<h3>3.3 Design Boundaries</h3>
+<p>The UI handles display and input. Service classes hold application decisions. DAO interfaces describe persistence operations, while JDBC implementations handle SQL. This separation makes the persistence contract explicit and gives the project concrete examples of abstraction and package organization.</p>
+<h2>Chapter 4: Database Design</h2>
+<h3>4.1 Entity Relationships</h3>
+<pre><code>users 1 ---- many user_skills many ---- 1 skills
+users 1 ---- many learning_requests (sender)
+users 1 ---- many learning_requests (receiver)
+skills 1 ---- many learning_requests (offered skill)
+skills 1 ---- many learning_requests (requested skill)</code></pre>
+<p><code>user_skills</code> resolves the many-to-many relationship between users and skills. Its <code>skill_type</code> column records whether a student teaches or wants to learn that skill.</p>
+<h3>4.2 Tables and Keys</h3>
+<table><thead><tr><th>Table</th><th>Purpose and key fields</th></tr></thead><tbody>
+<tr><td><code>users</code></td><td>Student profile; <code>user_id</code> is the primary key; <code>email</code> is unique; stores encoded hash, salt, and creation time.</td></tr>
+<tr><td><code>skills</code></td><td>Shared skill catalogue; <code>skill_id</code> is the primary key; <code>skill_name</code> is unique.</td></tr>
+<tr><td><code>user_skills</code></td><td>Student portfolio junction; <code>user_skill_id</code> is the primary key; <code>user_id</code> and <code>skill_id</code> are foreign keys.</td></tr>
+<tr><td><code>learning_requests</code></td><td>Exchange proposal; <code>request_id</code> is the primary key; sender, receiver, offered skill, and requested skill are foreign keys.</td></tr>
+</tbody></table>
+<h3>4.3 Integrity and Indexing</h3>
+<p>The schema uses InnoDB foreign keys with cascading deletes for dependent portfolio and request rows. A unique constraint on <code>(user_id, skill_id, skill_type)</code> prevents duplicate portfolio entries. A check prevents self-directed requests. Request status is limited to <code>PENDING</code>, <code>ACCEPTED</code>, or <code>REJECTED</code>. Indexes support reciprocal matching and request lookup by student, status, and creation time.</p>
+<p>The schema separates the skill catalogue from each student&#x27;s portfolio, so a skill name and category are stored once. The junction table stores the relationship and type. This reduces repeated skill text and keeps updates consistent.</p>
+<h2>Chapter 5: Implementation</h2>
+<h3>5.1 Package Structure</h3>
+<table><thead><tr><th>Package</th><th>Main responsibility</th><th>Representative classes</th></tr></thead><tbody>
+<tr><td><code>com.skillchain.model</code></td><td>Domain objects and validation</td><td><code>Person</code>, <code>User</code>, <code>Skill</code>, <code>LearningRequest</code></td></tr>
+<tr><td><code>com.skillchain.dao</code></td><td>Persistence abstractions and JDBC</td><td><code>UserDao</code>, <code>SkillDaoImpl</code>, <code>LearningRequestDaoImpl</code></td></tr>
+<tr><td><code>com.skillchain.service</code></td><td>Application rules and workflows</td><td><code>UserService</code>, <code>SkillService</code>, <code>MatchingService</code>, <code>RequestService</code></td></tr>
+<tr><td><code>com.skillchain.ui</code></td><td>Swing application screens</td><td><code>LoginRegisterFrame</code>, <code>MainFrame</code></td></tr>
+<tr><td><code>com.skillchain.util</code></td><td>Shared infrastructure and exceptions</td><td><code>DatabaseConnection</code>, <code>PasswordUtil</code>, <code>DatabaseException</code></td></tr>
+</tbody></table>
+<h3>5.2 OOP Concepts in the Code</h3>
+<table><thead><tr><th>Concept</th><th>Implementation</th></tr></thead><tbody>
+<tr><td>Encapsulation</td><td>Model fields are private; constructors and setters validate values.</td></tr>
+<tr><td>Abstraction</td><td><code>Person</code> is abstract; DAO interfaces define persistence contracts separately from JDBC classes.</td></tr>
+<tr><td>Inheritance</td><td><code>User</code> and <code>PeerStudent</code> extend <code>Person</code>.</td></tr>
+<tr><td>Runtime polymorphism</td><td><code>User</code> overrides <code>getRole()</code> and <code>getSummary()</code>; a <code>Person</code> reference can refer to a <code>User</code>.</td></tr>
+<tr><td>Compile-time polymorphism</td><td>Skill search and portfolio read methods are overloaded for keyword/category and skill-type variants.</td></tr>
+<tr><td>Packages</td><td>UI, services, DAO, models, and utilities are grouped under separate Java packages.</td></tr>
+<tr><td>Exception handling</td><td>Domain exceptions distinguish duplicate email, duplicate skill, and invalid login; JDBC failures are represented by <code>SQLException</code> and handled at the UI boundary.</td></tr>
+</tbody></table>
+<h3>5.3 JDBC and CRUD Operations</h3>
+<table><thead><tr><th>Operation</th><th>Application example</th><th>Database effect</th></tr></thead><tbody>
+<tr><td>Create</td><td>Register a student, add a portfolio skill, or send a proposal</td><td><code>INSERT</code> into <code>users</code>, <code>user_skills</code>, or <code>learning_requests</code></td></tr>
+<tr><td>Read</td><td>Load a portfolio, directory, match list, or requests</td><td><code>SELECT</code> with filters and joins</td></tr>
+<tr><td>Update</td><td>Accept or reject a pending exchange request</td><td><code>UPDATE</code> request status for the addressed receiver only</td></tr>
+<tr><td>Delete</td><td>Remove a student&#x27;s own portfolio entry</td><td><code>DELETE</code> constrained by both portfolio row ID and owner ID</td></tr>
+</tbody></table>
+<p>DAO methods use <code>PreparedStatement</code> parameters. JDBC connections, statements, and result sets use try-with-resources so they close when each operation finishes.</p>
+<h3>5.4 Reciprocal Match Rule</h3>
+<p>A peer is returned when both conditions are true:</p>
+<ol>
+<li>The current student teaches a skill the peer wants to learn.</li>
+<li>The peer teaches a skill the current student wants to learn.</li>
+</ol>
+<p><code>MatchingService.findReciprocalMatches</code> applies these conditions in a four-way join on <code>user_skills</code>, then joins users and skills for the display names. This makes the match a database-backed result rather than a hard-coded recommendation.</p>
+<h3>5.5 Password Storage and Migration</h3>
+<p>New passwords use PBKDF2-HMAC-SHA256 with 600,000 iterations and a unique 16-byte random salt. The encoded hash records its algorithm and work factor. The verifier accepts the earlier salted SHA-256 format for existing demo accounts; after a correct login, <code>UserService</code> stores a PBKDF2 hash and a fresh salt. The schema expands the hash column to fit the encoded value. The work factor follows the current OWASP Password Storage Cheat Sheet guidance for PBKDF2-HMAC-SHA256.</p>
+<h2>Chapter 6: Verification and Test Plan</h2>
+<h3>6.1 Verification Run</h3>
+<p>The Java sources were compiled with <code>javac --release 17</code> on 25 November 2026. The database-independent <code>CoreOopVerification</code> smoke check then completed with the output <code>Core OOP verification passed.</code> It covers inheritance and method overriding, model validation, enum parsing, recursive category traversal, PBKDF2 verification, malformed salt handling, and compatibility with a seeded legacy demo hash.</p>
+<p>No live MySQL connection was configured for this workspace run. Database integration cases below remain pending until the team executes them against its configured MySQL 8.0 database and records the result.</p>
+<h3>6.2 Test Matrix</h3>
+<table><thead><tr><th>ID</th><th>Test</th><th>Expected result</th><th>Current status</th></tr></thead><tbody>
+<tr><td>V01</td><td>Compile Java sources for release 17</td><td>All application classes compile</td><td>Pass, 25 Nov 2026</td></tr>
+<tr><td>V02</td><td>Run <code>CoreOopVerification</code></td><td>Smoke check prints its pass message</td><td>Pass, 25 Nov 2026</td></tr>
+<tr><td>DB01</td><td>Execute <code>schema.sql</code> on MySQL 8.0</td><td>Database, four tables, indexes, constraints, and seed rows exist</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB02</td><td>Register a new student, then inspect <code>users</code></td><td>One account row is added with a PBKDF2 hash and salt</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB03</td><td>Log in with a seeded legacy account</td><td>Login succeeds and the stored hash changes to PBKDF2</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB04</td><td>Add, list, search, and remove a portfolio skill</td><td>CRUD operations affect only the signed-in student&#x27;s portfolio</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB05</td><td>Load the seeded reciprocal pair</td><td>Alice/Bob and Charlie/Diana each appear as mutual matches</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB06</td><td>Send a proposal and list incoming/outgoing requests</td><td>The request appears with <code>PENDING</code> status</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB07</td><td>Accept/reject as receiver; attempt update as another user</td><td>Only the addressed receiver can transition a pending request</td><td>Pending live MySQL run</td></tr>
+<tr><td>DB08</td><td>Stop MySQL and refresh data</td><td>The UI shows a controlled database error</td><td>Pending live MySQL run</td></tr>
+</tbody></table>
+<p>For every live test, record the date, tester, demo account, input, actual result, pass/fail result, and screenshot or SQL output in <code>docs/VERIFICATION_RESULTS.md</code>.</p>
+<h2>Chapter 7: Security, Limitations, and Maintenance</h2>
+<h3>7.1 Security Controls</h3>
+<ul>
+<li>Passwords are stored as salted PBKDF2 hashes; the old demo format is upgraded after successful authentication.</li>
+<li>JDBC statements use parameters rather than concatenating user input into SQL.</li>
+<li>Foreign keys, uniqueness, check constraints, and status values protect database consistency.</li>
+<li>Portfolio deletion checks ownership. Request decisions check both receiver ownership and pending status in the SQL update.</li>
+<li>Local database credentials are kept in <code>config.properties</code>, which is ignored by Git.</li>
+</ul>
+<h3>7.2 Limitations</h3>
+<ul>
+<li>The current verification run did not include a configured live MySQL server. The pending integration tests must be completed before final submission.</li>
+<li>The application is a local Swing demonstration, not a deployed campus service. The supplied sample accounts and password are public demo credentials.</li>
+<li>JDBC actions run from Swing event handlers, so a slow database can make the interface pause. A later version can move database work to <code>SwingWorker</code>.</li>
+<li>The directory displays student email addresses to logged-in users. A deployed version should add consent and profile privacy controls.</li>
+<li>Database connection settings are intended for local development. A deployed database should use managed credentials and verified TLS.</li>
+</ul>
+<h3>7.3 Maintenance</h3>
+<p>Run the database script when creating a fresh environment. For an existing database, the script widens <code>users.password_hash</code>; back up the database before changing a shared environment. Keep the JDBC driver and Java runtime aligned with the build file. Re-run the OOP smoke check after model or password changes, and complete the live database test matrix after DAO or schema changes.</p>
+<h2>Chapter 8: Conclusion and Future Work</h2>
+<p>Skill Chain implements a complete campus skill exchange path: students record teaching and learning interests, the matching service finds mutual opportunities, and students can manage exchange proposals. Java packages and OOP models organize the application, while JDBC DAOs connect the service layer to a relational MySQL schema with CRUD operations and integrity constraints.</p>
+<p>The source compiles and the database-independent OOP smoke check passes. The next submission step is to run the pending MySQL integration tests, capture current output screens, and fill in the team and faculty details on the preliminary pages.</p>
+<p>Future work includes running database tasks off the Swing event thread, adding privacy settings and institutional account verification, and adding an administrator workflow for catalogue maintenance.</p>
+<h2>References</h2>
+<ol>
+<li>Oracle. <em>Java SE Documentation</em>. https://docs.oracle.com/en/java/</li>
+<li>Oracle. <em>MySQL 8.0 Reference Manual</em>. https://dev.mysql.com/doc/refman/8.0/en/</li>
+<li>OWASP. <em>Password Storage Cheat Sheet</em>. https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html</li>
+<li>Oracle. <em>MySQL Connector/J Developer Guide</em>. https://dev.mysql.com/doc/connector-j/en/</li>
+</ol>
+<h2>Appendix A: SQL Schema</h2>
+<p>The complete executable schema, including table definitions, primary keys, foreign keys, uniqueness and check constraints, indexes, demo users, skills, portfolios, and request rows, is maintained in <a href="../schema.sql"><code>schema.sql</code></a>. Run that file in MySQL Workbench or the MySQL command-line client before launching the application.</p>
+<h2>Appendix B: Output Screenshots</h2>
+<p>The following application screens are included as output evidence. The current repository&#x27;s reciprocal-match image is from a different data set than the checked-in demo seed rows; regenerate it after loading <code>schema.sql</code> before using that screen in the final submission.</p>
+<table><thead><tr><th>Screen</th><th>Evidence file</th></tr></thead><tbody>
+<tr><td>Login</td><td><a href="screenshots/01_Login_Screen.png"><code>01_Login_Screen.png</code></a></td></tr>
+<tr><td>Registration</td><td><a href="screenshots/02_Registration_Screen.png"><code>02_Registration_Screen.png</code></a></td></tr>
+<tr><td>Dashboard</td><td><a href="screenshots/03_Dashboard_Overview.png"><code>03_Dashboard_Overview.png</code></a></td></tr>
+<tr><td>My skills portfolio</td><td><a href="screenshots/04_My_Skills_Portfolio.png"><code>04_My_Skills_Portfolio.png</code></a></td></tr>
+<tr><td>Skill category tree</td><td><a href="screenshots/05_Skill_Category_Tree_Hierarchy.png"><code>05_Skill_Category_Tree_Hierarchy.png</code></a></td></tr>
+<tr><td>Campus directory</td><td><a href="screenshots/06_Campus_Directory.png"><code>06_Campus_Directory.png</code></a></td></tr>
+<tr><td>Incoming requests</td><td><a href="screenshots/08_Incoming_Requests.png"><code>08_Incoming_Requests.png</code></a></td></tr>
+<tr><td>Outgoing requests</td><td><a href="screenshots/09_Outgoing_Requests.png"><code>09_Outgoing_Requests.png</code></a></td></tr>
+<tr><td>Notifications</td><td><a href="screenshots/10_Notifications_Center.png"><code>10_Notifications_Center.png</code></a></td></tr>
+</tbody></table>
+<h3>B.1 Login Screen</h3>
+<figure><img src="docs/screenshots/01_Login_Screen.png" alt="Skill Chain login screen"><figcaption>Skill Chain login screen</figcaption></figure>
+<h3>B.2 Dashboard</h3>
+<figure><img src="docs/screenshots/03_Dashboard_Overview.png" alt="Skill Chain dashboard"><figcaption>Skill Chain dashboard</figcaption></figure>
+<h3>B.3 Student Skill Portfolio</h3>
+<figure><img src="docs/screenshots/04_My_Skills_Portfolio.png" alt="Skill portfolio showing teach and learn entries"><figcaption>Skill portfolio showing teach and learn entries</figcaption></figure>
+<h3>B.4 Campus Directory</h3>
+<figure><img src="docs/screenshots/06_Campus_Directory.png" alt="Campus student directory"><figcaption>Campus student directory</figcaption></figure>
+<h3>B.5 Notifications</h3>
+<figure><img src="docs/screenshots/10_Notifications_Center.png" alt="Skill Chain notifications center"><figcaption>Skill Chain notifications center</figcaption></figure>
+</body></html>
