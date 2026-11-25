@@ -1,61 +1,92 @@
 # Skill Chain
 
-Skill Chain is a Java Swing desktop application for reciprocal skill exchange among campus students. A student lists skills to teach and skills to learn; the matching screen finds peers where both sides have something the other wants.
+### Trade what you know. Learn what you don't.
 
-## What it demonstrates
+Skill Chain is a campus skill-exchange application built with Java Swing and MySQL. Students list the skills they can teach and the skills they want to learn. The app finds pairs where the interest is mutual, then lets them send and manage an exchange request.
 
-- Java 17, Swing, packages, and the OOP concepts in the project rubric.
-- MySQL relational design: `users`, `skills`, `user_skills`, and `learning_requests`.
-- JDBC CRUD workflows using DAO interfaces, prepared statements, and try-with-resources.
-- Reciprocal matching with a four-way join across student skill records.
-- Domain exceptions, database error handling, and password-hash migration.
+![Skill Chain dashboard](screenshots/03_Dashboard_Overview.png)
 
-See [`docs/FINAL_PROJECT_REPORT.md`](docs/FINAL_PROJECT_REPORT.md) for the report organized to the college's required structure. See [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) for the verification record and remaining live-MySQL checks.
+## The idea in one example
 
-## Requirements
+Alice can teach Java and wants to learn Python. Bob can teach Python and wants to learn Java. Skill Chain recognizes the two-way fit and shows them as a reciprocal match. Each student can then send, receive, accept, or reject a learning request in the app.
+
+## What students can do
+
+- Create an account and manage a personal skill portfolio.
+- Add skills to teach or skills to learn, organized by category.
+- Browse the campus directory and find reciprocal skill matches.
+- Send learning requests and follow their pending, accepted, or rejected status.
+- Review incoming and outgoing requests and see in-app notifications.
+
+## How the application is put together
+
+```mermaid
+flowchart LR
+    Student[Student] --> UI[Java Swing interface]
+    UI --> Service[Service layer]
+    Service --> DAO[DAO interfaces and JDBC]
+    DAO --> DB[(MySQL database)]
+    Service --> Match[Reciprocal matching]
+    Match --> DB
+```
+
+The matching query checks both sides of a potential exchange: a student's teaching skill must be something the peer wants, and the peer's teaching skill must be something the student wants. The result comes from the stored student and skill records.
+
+## Java and OOP in the project
+
+| Concept | Where it appears |
+|---|---|
+| Encapsulation | Domain objects keep their state behind fields and methods. |
+| Abstraction | `Person` defines shared student behavior. |
+| Inheritance | `User` and `PeerStudent` build on `Person`. |
+| Polymorphism | Student types provide their own implementations of inherited behavior. |
+| Packages | `model`, `dao`, `service`, `ui`, and `util` separate project responsibilities. |
+| Exception handling | Domain exceptions identify cases such as duplicate records and invalid login; database errors are handled at the application boundary. |
+
+DAO interfaces separate the service logic from JDBC persistence. Database calls use prepared statements and try-with-resources.
+
+## Database design
+
+The MySQL schema uses primary keys, foreign keys, unique constraints, and indexes across four main tables:
+
+| Table | Purpose |
+|---|---|
+| `users` | Student accounts and profile details. |
+| `skills` | Shared catalogue of skills and categories. |
+| `user_skills` | Links each student to skills they teach or want to learn. |
+| `learning_requests` | Records the offered skill, requested skill, participants, and request status. |
+
+The app demonstrates create, read, update, and delete operations through registration, skill portfolios, and learning requests.
+
+## Run it locally
+
+### You need
 
 - JDK 17 or later
 - MySQL 8.0 or later
-- Maven (optional; Windows batch scripts are also provided)
+- Maven, or Windows for the included batch scripts
 
-## Run locally
+### Start the application
 
-1. Run `schema.sql` in MySQL. The script creates the database, tables, indexes, constraints, and demo data. It also widens `users.password_hash` for the current encoded PBKDF2 value on databases created by an earlier version.
-2. Copy `config.properties.example` to `config.properties` and set `db.url`, `db.user`, and `db.password`. The local configuration file is ignored by Git.
-3. Start the app with `mvn exec:java`, or use `run.bat` on Windows.
+1. Run [`schema.sql`](schema.sql) in MySQL. It creates `skill_chain_db`, its tables, and sample data for a classroom demonstration.
+2. Copy `config.properties.example` to `config.properties` and set `db.url`, `db.user`, and `db.password` for your local MySQL account. The local config file is excluded from Git.
+3. From the project folder, run:
 
-The four seeded demo accounts share the password `Password123!`:
+   ```bash
+   mvn exec:java
+   ```
 
-| Student | Login | Example exchange |
-|---|---|---|
-| Alice Johnson | `alice@university.edu` | Teaches Java; wants Python |
-| Bob Smith | `bob@university.edu` | Teaches Python; wants Java |
-| Charlie Davis | `charlie@university.edu` | Teaches React; wants SQL |
-| Diana Prince | `diana@university.edu` | Teaches SQL; wants React |
+   On Windows, `run.bat` is also available.
 
-These credentials are for the classroom demonstration only. Do not reuse them for a real account.
+The sample students in `schema.sql` share the classroom password `Password123!`. Use these accounts for demonstration only.
 
-## Code map
+## Project material
 
-| Package | Responsibility |
-|---|---|
-| `model` | Encapsulated domain objects and the `Person` abstraction |
-| `dao` | Persistence contracts and JDBC implementations |
-| `service` | Registration, skill workflows, matching, and requests |
-| `ui` | Swing screens and interaction |
-| `util` | Database configuration, password hashing, and domain exceptions |
+- [Final project report](Skill_Chain_Final_Project_Report.pdf)
+- [Report chapters in Markdown](docs/FINAL_PROJECT_REPORT.md)
+- [CRUD demonstration guide](docs/CRUD_DEMONSTRATION.md)
+- [Application screenshots](screenshots/)
 
-`User` and `PeerStudent` inherit from abstract `Person`. `User` overrides abstract methods; skill search and portfolio methods are overloaded. The DAO interfaces keep services independent of JDBC implementations. Checked domain exceptions distinguish duplicate records and invalid credentials, while `SQLException` is handled at the UI boundary.
+## Built with
 
-## Password handling
-
-New registrations use PBKDF2-HMAC-SHA256 with a unique 16-byte random salt and a stored work factor. Earlier demo accounts remain compatible: after a successful login, their legacy salted SHA-256 hash is replaced with the current format. The schema widens the hash column for this encoded value.
-
-## Report and evidence
-
-- [`docs/FINAL_PROJECT_REPORT.md`](docs/FINAL_PROJECT_REPORT.md): chapters 1–8, references, and appendices.
-- [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md): executable smoke-check steps and database test matrix.
-- [`docs/VERIFICATION_RESULTS.md`](docs/VERIFICATION_RESULTS.md): checks run in this workspace and checks that still need a configured MySQL server.
-- [`screenshots/`](screenshots/): application output screens.
-
-The file `screenshots/07_Reciprocal_Matches_STALE_DO_NOT_USE.png` shows a different data set than the checked-in seed. Regenerate it after loading `schema.sql` before using it as final evidence.
+Java 17 · Swing · JDBC · MySQL 8 · Maven
