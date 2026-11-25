@@ -1462,7 +1462,10 @@ public class MainFrame extends JFrame {
                 lblMsg.setFont(UITheme.FONT_BODY);
                 lblMsg.setForeground(new Color(51, 65, 85));
 
-                JLabel lblTime = new JLabel(n.getTimestamp().format(dtf));
+                String timestampText = n.getTimestamp() == null
+                        ? "Approval time not recorded"
+                        : n.getTimestamp().format(dtf);
+                JLabel lblTime = new JLabel(timestampText);
                 lblTime.setFont(new Font("Segoe UI", Font.PLAIN, 11));
                 lblTime.setForeground(new Color(148, 163, 184));
 
@@ -1848,7 +1851,10 @@ public class MainFrame extends JFrame {
                     lblStatus.setForeground(new Color(5, 150, 105));
                     statusBadge.add(lblStatus);
 
-                    JLabel lblDate = new JLabel("Since: " + ap.getEstablishedDate().format(dtf));
+                    String approvedText = ap.getApprovedAt() == null
+                            ? "Approval date not recorded"
+                            : "Since: " + ap.getApprovedAt().format(dtf);
+                    JLabel lblDate = new JLabel(approvedText);
                     lblDate.setFont(new Font("Segoe UI", Font.PLAIN, 11));
                     lblDate.setForeground(new Color(148, 163, 184));
 

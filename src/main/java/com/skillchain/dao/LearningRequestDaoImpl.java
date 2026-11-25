@@ -2,6 +2,7 @@ package com.skillchain.dao;
 
 import com.skillchain.model.LearningRequest;
 import com.skillchain.util.DatabaseConnection;
+import com.skillchain.util.DatabaseTime;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -75,15 +76,17 @@ public class LearningRequestDaoImpl implements LearningRequestDao {
 
     @Override
     public boolean updateStatus(int requestId, int receiverId, String newStatus) throws SQLException {
-        final String sql = "UPDATE learning_requests SET status = ? " +
+        final String sql = "UPDATE learning_requests " +
+                           "SET status = ?, approved_at = CASE WHEN ? = 'ACCEPTED' THEN CURRENT_TIMESTAMP ELSE approved_at END " +
                            "WHERE request_id = ? AND receiver_id = ? AND status = 'PENDING'";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newStatus);
-            stmt.setInt(2, requestId);
-            stmt.setInt(3, receiverId);
+            stmt.setString(2, newStatus);
+            stmt.setInt(3, requestId);
+            stmt.setInt(4, receiverId);
 
             return stmt.executeUpdate() > 0;
         }
@@ -149,7 +152,10 @@ public class LearningRequestDaoImpl implements LearningRequestDao {
                     String reqSkillName = rs.getString("requested_skill_name");
                     String status = rs.getString("status");
                     Timestamp ts = rs.getTimestamp("created_at");
-                    LocalDateTime createdAt = ts != null ? ts.toLocalDateTime() : LocalDateTime.now();
+                    LocalDateTime createdAt = DatabaseTime.toLocalDateTime(ts);
+                    if (createdAt == null) {
+                        createdAt = LocalDateTime.now();
+                    }
 
                     list.add(new LearningRequest(reqId, sId, sName, rId, rName, offId, offName, reqSkillId, reqSkillName, status, createdAt));
                 }

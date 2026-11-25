@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS learning_requests (
     requested_skill_id INT NOT NULL,
     status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING' NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    approved_at TIMESTAMP NULL DEFAULT NULL,
     CONSTRAINT fk_request_sender FOREIGN KEY (sender_id) 
         REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_request_receiver FOREIGN KEY (receiver_id) 
@@ -82,6 +83,23 @@ CREATE TABLE IF NOT EXISTS learning_requests (
     KEY idx_requests_receiver_status_time (receiver_id, status, created_at),
     KEY idx_requests_sender_status_time (sender_id, status, created_at)
 ) ENGINE=InnoDB;
+
+-- Add the approval timestamp to existing databases without dropping records.
+SET @approved_at_exists = (
+    SELECT COUNT(*)
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'learning_requests'
+      AND COLUMN_NAME = 'approved_at'
+);
+SET @approved_at_ddl = IF(
+    @approved_at_exists = 0,
+    'ALTER TABLE learning_requests ADD COLUMN approved_at TIMESTAMP NULL DEFAULT NULL AFTER created_at',
+    'SELECT 1'
+);
+PREPARE approved_at_stmt FROM @approved_at_ddl;
+EXECUTE approved_at_stmt;
+DEALLOCATE PREPARE approved_at_stmt;
 
 -- ============================================================================
 -- SEED DATA (Pre-populated sample data for testing and demonstration)
@@ -138,7 +156,7 @@ INSERT IGNORE INTO user_skills (user_id, skill_id, skill_type) VALUES
 -- Sample Learning Requests for immediate demonstration:
 -- 1. Alice proposed swap with Bob (Java for Python) -> ACCEPTED
 -- 2. Charlie proposed swap with Alice (React for Java) -> PENDING
-INSERT IGNORE INTO learning_requests (request_id, sender_id, receiver_id, offered_skill_id, requested_skill_id, status) VALUES
-(1, 1, 2, 1, 2, 'ACCEPTED'),
-(2, 3, 1, 5, 1, 'PENDING');
+INSERT IGNORE INTO learning_requests (request_id, sender_id, receiver_id, offered_skill_id, requested_skill_id, status, approved_at) VALUES
+(1, 1, 2, 1, 2, 'ACCEPTED', CURRENT_TIMESTAMP),
+(2, 3, 1, 5, 1, 'PENDING', NULL);
 

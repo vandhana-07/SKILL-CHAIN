@@ -4,6 +4,7 @@ import com.skillchain.model.Skill;
 import com.skillchain.model.SkillType;
 import com.skillchain.model.UserSkill;
 import com.skillchain.util.DatabaseConnection;
+import com.skillchain.util.DatabaseTime;
 import com.skillchain.util.DuplicateSkillException;
 
 import java.sql.Connection;
@@ -296,7 +297,7 @@ public class SkillDaoImpl implements SkillDao {
                 rs.getString("skill_name"),
                 rs.getString("category"),
                 SkillType.fromString(rs.getString("skill_type")),
-                ts != null ? ts.toLocalDateTime() : null
+                DatabaseTime.toLocalDateTime(ts)
         );
     }
 }

@@ -2,6 +2,7 @@ package com.skillchain.dao;
 
 import com.skillchain.model.User;
 import com.skillchain.util.DatabaseConnection;
+import com.skillchain.util.DatabaseTime;
 import com.skillchain.util.DuplicateEmailException;
 
 import java.sql.Connection;
@@ -163,7 +164,7 @@ public class UserDaoImpl implements UserDao {
                 rs.getString("email"),
                 rs.getString("password_hash"),
                 rs.getString("salt"),
-                timestamp != null ? timestamp.toLocalDateTime() : null
+                DatabaseTime.toLocalDateTime(timestamp)
         );
     }
 }

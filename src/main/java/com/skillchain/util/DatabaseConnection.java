@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ============================================================================
@@ -65,7 +67,7 @@ public final class DatabaseConnection {
                 }
             }
 
-            dbUrl = properties.getProperty("db.url");
+            dbUrl = configureUtcSession(properties.getProperty("db.url"));
             dbUser = properties.getProperty("db.user");
             dbPassword = properties.getProperty("db.password", "");
 
@@ -85,6 +87,32 @@ public final class DatabaseConnection {
         } catch (IOException e) {
             throw new DatabaseException("Failed to read " + CONFIG_FILE_NAME + ": " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Keeps MySQL TIMESTAMP reads and writes on one known UTC session, even
+     * when an existing local config still contains the older serverTimezone option.
+     */
+    private static String configureUtcSession(String url) {
+        if (url == null || !url.startsWith("jdbc:mysql:")) {
+            return url;
+        }
+
+        String[] parts = url.split("\\?", 2);
+        List<String> parameters = new ArrayList<>();
+        if (parts.length == 2) {
+            for (String parameter : parts[1].split("&")) {
+                String key = parameter.split("=", 2)[0];
+                if (!key.equalsIgnoreCase("serverTimezone")
+                        && !key.equalsIgnoreCase("connectionTimeZone")
+                        && !key.equalsIgnoreCase("forceConnectionTimeZoneToSession")) {
+                    parameters.add(parameter);
+                }
+            }
+        }
+        parameters.add("connectionTimeZone=UTC");
+        parameters.add("forceConnectionTimeZoneToSession=true");
+        return parts[0] + "?" + String.join("&", parameters);
     }
 
     /**

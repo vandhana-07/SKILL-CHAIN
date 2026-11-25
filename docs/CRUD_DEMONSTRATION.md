@@ -10,7 +10,7 @@ This guide maps the project’s database operations to visible application actio
 | Read skills | Open My Skills tab | `SkillService.getUserSkills` → `SkillDaoImpl.getUserSkills` | `SELECT ... JOIN skills` |
 | Create request | Send swap invitation | `RequestService.sendRequest` → `LearningRequestDaoImpl.save` | `INSERT INTO learning_requests` |
 | Read requests | Open incoming/outgoing requests | `RequestService.getIncomingRequests` / `getOutgoingRequests` | `SELECT ... JOIN users/skills` |
-| Update request | Accept or reject invitation | `RequestService.acceptRequest` / `rejectRequest` | `UPDATE learning_requests SET status` |
+| Update request | Accept or reject invitation | `RequestService.acceptRequest` / `rejectRequest` | `UPDATE learning_requests SET status`; acceptance also stores `approved_at` |
 | Delete skill mapping | Select a skill and choose Remove | `SkillService.removeUserSkill` → `SkillDaoImpl.removeUserSkill` | `DELETE FROM user_skills` |
 
 ## Viva sequence

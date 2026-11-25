@@ -332,7 +332,7 @@ public class LoginRegisterFrame extends JFrame {
         gbc.insets = new Insets(4, 6, 2, 6);
         content.add(label("JDBC URL", UITheme.FONT_BODY_BOLD, UITheme.COLOR_TEXT_PRIMARY), at(gbc, row++));
         ModernTextField urlField = new ModernTextField("jdbc:mysql://localhost:3306/skill_chain_db");
-        urlField.setText("jdbc:mysql://localhost:3306/skill_chain_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        urlField.setText("jdbc:mysql://localhost:3306/skill_chain_db?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true");
         gbc.insets = new Insets(2, 6, 8, 6);
         content.add(urlField, at(gbc, row++));
         gbc.insets = new Insets(4, 6, 2, 6);

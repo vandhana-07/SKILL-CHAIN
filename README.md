@@ -54,7 +54,7 @@ The MySQL schema uses primary keys, foreign keys, unique constraints, and indexe
 | `users` | Student accounts and profile details. |
 | `skills` | Shared catalogue of skills and categories. |
 | `user_skills` | Links each student to skills they teach or want to learn. |
-| `learning_requests` | Records the offered skill, requested skill, participants, and request status. |
+| `learning_requests` | Records the offered/requested skills, participants, request status, and approval time. |
 
 The app demonstrates create, read, update, and delete operations through registration, skill portfolios, and learning requests.
 

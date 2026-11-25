@@ -9,6 +9,7 @@ import com.skillchain.model.AppNotification;
 import com.skillchain.model.LearningRequest;
 import com.skillchain.model.PeerStudent;
 import com.skillchain.util.DatabaseConnection;
+import com.skillchain.util.DatabaseTime;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -110,14 +111,14 @@ public class RequestService {
                 "       CASE WHEN lr.sender_id = ? THEN u_recv.email ELSE u_send.email END AS partner_email, " +
                 "       CASE WHEN lr.sender_id = ? THEN s_off.skill_name ELSE s_req.skill_name END AS you_teach, " +
                 "       CASE WHEN lr.sender_id = ? THEN s_req.skill_name ELSE s_off.skill_name END AS partner_teaches, " +
-                "       lr.status, lr.created_at " +
+                "       lr.status, lr.approved_at " +
                 "FROM learning_requests lr " +
                 "JOIN users u_send ON lr.sender_id = u_send.user_id " +
                 "JOIN users u_recv ON lr.receiver_id = u_recv.user_id " +
                 "JOIN skills s_off ON lr.offered_skill_id = s_off.skill_id " +
                 "JOIN skills s_req ON lr.requested_skill_id = s_req.skill_id " +
                 "WHERE (lr.sender_id = ? OR lr.receiver_id = ?) AND lr.status = 'ACCEPTED' " +
-                "ORDER BY lr.created_at DESC";
+                "ORDER BY lr.approved_at DESC";
 
         List<ActivePartnership> list = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -133,7 +134,7 @@ public class RequestService {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Timestamp ts = rs.getTimestamp("created_at");
+                    Timestamp ts = rs.getTimestamp("approved_at");
                     list.add(new ActivePartnership(
                             rs.getInt("request_id"),
                             rs.getInt("partner_id"),
@@ -142,7 +143,7 @@ public class RequestService {
                             rs.getString("you_teach"),
                             rs.getString("partner_teaches"),
                             rs.getString("status"),
-                            ts != null ? ts.toLocalDateTime() : LocalDateTime.now()
+                            DatabaseTime.toLocalDateTime(ts)
                     ));
                 }
             }
@@ -161,13 +162,13 @@ public class RequestService {
         // 1. Accepted proposals (your sent invitation was accepted by classmate)
         final String acceptedSql =
                 "SELECT lr.request_id, u_recv.name AS partner_name, u_recv.email AS partner_email, " +
-                "       s_off.skill_name AS off_skill, s_req.skill_name AS req_skill, lr.created_at " +
+                "       s_off.skill_name AS off_skill, s_req.skill_name AS req_skill, lr.approved_at " +
                 "FROM learning_requests lr " +
                 "JOIN users u_recv ON lr.receiver_id = u_recv.user_id " +
                 "JOIN skills s_off ON lr.offered_skill_id = s_off.skill_id " +
                 "JOIN skills s_req ON lr.requested_skill_id = s_req.skill_id " +
                 "WHERE lr.sender_id = ? AND lr.status = 'ACCEPTED' " +
-                "ORDER BY lr.created_at DESC";
+                "ORDER BY lr.approved_at DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(acceptedSql)) {
@@ -178,7 +179,7 @@ public class RequestService {
                     String pEmail = rs.getString("partner_email");
                     String offSkill = rs.getString("off_skill");
                     String reqSkill = rs.getString("req_skill");
-                    Timestamp ts = rs.getTimestamp("created_at");
+                    Timestamp ts = rs.getTimestamp("approved_at");
 
                     notifications.add(new AppNotification(
                             rs.getInt("request_id"),
@@ -186,7 +187,7 @@ public class RequestService {
                             "Exchange Proposal Accepted! 🎉",
                             pName + " (" + pEmail + ") accepted your request! You teach " + offSkill + " ⇄ they teach " + reqSkill + ".",
                             pName, pEmail,
-                            ts != null ? ts.toLocalDateTime() : LocalDateTime.now()
+                            DatabaseTime.toLocalDateTime(ts)
                     ));
                 }
             }
@@ -220,13 +221,19 @@ public class RequestService {
                             "New Skill Exchange Proposal! 📬",
                             pName + " (" + pEmail + ") wants to learn " + reqSkill + " from you and offers to teach " + offSkill + ".",
                             pName, pEmail,
-                            ts != null ? ts.toLocalDateTime() : LocalDateTime.now()
+                            DatabaseTime.toLocalDateTime(ts)
                     ));
                 }
             }
         }
 
-        notifications.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+        notifications.sort((a, b) -> {
+            LocalDateTime aTime = a.getTimestamp();
+            LocalDateTime bTime = b.getTimestamp();
+            if (aTime == null) return bTime == null ? 0 : 1;
+            if (bTime == null) return -1;
+            return bTime.compareTo(aTime);
+        });
         return notifications;
     }
 }

@@ -18,14 +18,14 @@ public class ActivePartnership {
     private String youTeachSkill;
     private String partnerTeachesSkill;
     private String status;
-    private LocalDateTime establishedDate;
+    private LocalDateTime approvedAt;
 
     public ActivePartnership() {
     }
 
     public ActivePartnership(int requestId, int partnerId, String partnerName, String partnerEmail,
                              String youTeachSkill, String partnerTeachesSkill, String status,
-                             LocalDateTime establishedDate) {
+                             LocalDateTime approvedAt) {
         this.requestId = requestId;
         this.partnerId = partnerId;
         this.partnerName = partnerName;
@@ -33,7 +33,7 @@ public class ActivePartnership {
         this.youTeachSkill = youTeachSkill;
         this.partnerTeachesSkill = partnerTeachesSkill;
         this.status = status;
-        this.establishedDate = establishedDate;
+        this.approvedAt = approvedAt;
     }
 
     public int getRequestId() {
@@ -92,11 +92,11 @@ public class ActivePartnership {
         this.status = status;
     }
 
-    public LocalDateTime getEstablishedDate() {
-        return establishedDate;
+    public LocalDateTime getApprovedAt() {
+        return approvedAt;
     }
 
-    public void setEstablishedDate(LocalDateTime establishedDate) {
-        this.establishedDate = establishedDate;
+    public void setApprovedAt(LocalDateTime approvedAt) {
+        this.approvedAt = approvedAt;
     }
 }
