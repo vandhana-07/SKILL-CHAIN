@@ -22,6 +22,9 @@ public class UserService {
 
     private static final Pattern STUDENT_EMAIL_PATTERN = Pattern.compile(
             "(?i)^[a-z]+\\.[a-z]\\.\\d{4}\\.[a-z]+@rajalakshmi\\.edu\\.in$");
+    private static final String EMAIL_FORMAT_HINT =
+            "Use name.initial.year.department@rajalakshmi.edu.in " +
+            "(for example, arjun.k.2025.cse@rajalakshmi.edu.in).";
 
     private final UserDao userDao;
 
@@ -53,10 +56,8 @@ public class UserService {
             throw new IllegalArgumentException("Full name must be at least 2 characters.");
         }
         String normalizedEmail = email == null ? "" : email.trim();
-        if (!STUDENT_EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
-            throw new IllegalArgumentException(
-                    "Email must follow name.initial.year.department@rajalakshmi.edu.in " +
-                    "(for example, vandhana.m.2025.ece@rajalakshmi.edu.in).");
+        if (!hasStudentEmailFormat(normalizedEmail)) {
+            throw new IllegalArgumentException("Email format is incorrect. " + EMAIL_FORMAT_HINT);
         }
         if (password == null || password.length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters long.");
@@ -97,7 +98,12 @@ public class UserService {
             throw new InvalidLoginException("Please provide both email and password.");
         }
 
-        Optional<User> userOpt = userDao.findByEmail(email.trim().toLowerCase());
+        String normalizedEmail = email.trim().toLowerCase();
+        if (!hasStudentEmailFormat(normalizedEmail)) {
+            throw new InvalidLoginException("Email format is incorrect. " + EMAIL_FORMAT_HINT);
+        }
+
+        Optional<User> userOpt = userDao.findByEmail(normalizedEmail);
 
         // Decision making: verify user existence
         if (userOpt.isEmpty()) {
@@ -125,5 +131,9 @@ public class UserService {
         }
 
         return user;
+    }
+
+    private static boolean hasStudentEmailFormat(String email) {
+        return email != null && STUDENT_EMAIL_PATTERN.matcher(email).matches();
     }
 }

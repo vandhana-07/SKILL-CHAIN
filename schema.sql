@@ -28,6 +28,19 @@ CREATE TABLE IF NOT EXISTS users (
 -- Idempotent compatibility migration for databases created by earlier versions.
 ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(120) NOT NULL;
 
+-- Keep the bundled demo accounts usable after strict college-email validation.
+UPDATE users SET email = CASE email
+    WHEN 'alice@university.edu' THEN 'alice.j.2025.cse@rajalakshmi.edu.in'
+    WHEN 'bob@university.edu' THEN 'bob.s.2025.ece@rajalakshmi.edu.in'
+    WHEN 'charlie@university.edu' THEN 'charlie.d.2024.bt@rajalakshmi.edu.in'
+    WHEN 'diana@university.edu' THEN 'diana.p.2023.mec@rajalakshmi.edu.in'
+    ELSE email
+END
+WHERE email IN (
+    'alice@university.edu', 'bob@university.edu',
+    'charlie@university.edu', 'diana@university.edu'
+);
+
 -- ----------------------------------------------------------------------------
 -- Table 2: skills
 -- Global catalog of skills organized by academic & technical category.
@@ -121,10 +134,10 @@ INSERT IGNORE INTO skills (skill_id, skill_name, category) VALUES
 
 -- 4 Sample Users (Password for all 4 is: Password123!)
 INSERT IGNORE INTO users (user_id, name, email, password_hash, salt) VALUES
-(1, 'Alice Johnson', 'alice@university.edu', '387e62dc1e72c9e88611fe78a51a12297cfaa858e3ac9db8ca15d110e4453826', 'ef8c7f2555b56cced090ce0b04fd574e'),
-(2, 'Bob Smith', 'bob@university.edu', '286c31d089fe148b8eb04191ce8c1b25f382129cacc7c641b55ed3679fd1a9f7', 'ae778d68f8948c531880886ad7837721'),
-(3, 'Charlie Davis', 'charlie@university.edu', '80372e49e43420718b1130b66d2786605029f4435ac131e4c443e4e9194f8090', '17fc8b95ec6f0a3f991215ec87b4a24e'),
-(4, 'Diana Prince', 'diana@university.edu', '0da212a69ba70527f48d67a607732d17dc6e17db8aa77b25ba95e2309a1e8894', '00287b6de26009d160fb6837586cc4b4');
+(1, 'Alice Johnson', 'alice.j.2025.cse@rajalakshmi.edu.in', '387e62dc1e72c9e88611fe78a51a12297cfaa858e3ac9db8ca15d110e4453826', 'ef8c7f2555b56cced090ce0b04fd574e'),
+(2, 'Bob Smith', 'bob.s.2025.ece@rajalakshmi.edu.in', '286c31d089fe148b8eb04191ce8c1b25f382129cacc7c641b55ed3679fd1a9f7', 'ae778d68f8948c531880886ad7837721'),
+(3, 'Charlie Davis', 'charlie.d.2024.bt@rajalakshmi.edu.in', '80372e49e43420718b1130b66d2786605029f4435ac131e4c443e4e9194f8090', '17fc8b95ec6f0a3f991215ec87b4a24e'),
+(4, 'Diana Prince', 'diana.p.2023.mec@rajalakshmi.edu.in', '0da212a69ba70527f48d67a607732d17dc6e17db8aa77b25ba95e2309a1e8894', '00287b6de26009d160fb6837586cc4b4');
 
 -- Sample User Skills to establish immediate Reciprocal Matches:
 -- Match Pair 1: Alice & Bob

@@ -15,7 +15,7 @@ This guide maps the project’s database operations to visible application actio
 
 ## Viva sequence
 
-1. Log in as `alice@university.edu` using the seeded password from the README.
+1. Log in as `alice.j.2025.cse@rajalakshmi.edu.in` using the seeded password from the README.
 2. Show Alice’s teaching and learning skills.
 3. Show the reciprocal match with Bob.
 4. Send a swap invitation and show the new pending request.

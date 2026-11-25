@@ -118,8 +118,8 @@ public class LoginRegisterFrame extends JFrame {
 
         gbc.insets = new Insets(4, 6, 2, 6);
         card.add(label("EMAIL ADDRESS", UITheme.FONT_BODY_BOLD, UITheme.COLOR_TEXT_PRIMARY), at(gbc, row++));
-        txtLoginEmail = new ModernTextField("e.g. alice@university.edu");
-        txtLoginEmail.setText("alice@university.edu");
+        txtLoginEmail = new ModernTextField("e.g. arjun.k.2025.cse@rajalakshmi.edu.in");
+        txtLoginEmail.setText("alice.j.2025.cse@rajalakshmi.edu.in");
         gbc.insets = new Insets(2, 6, 12, 6);
         card.add(txtLoginEmail, at(gbc, row++));
 
@@ -140,7 +140,7 @@ public class LoginRegisterFrame extends JFrame {
         demoBox.setBackground(UITheme.COLOR_SECONDARY);
         demoBox.setBorder(new CompoundBorderCompat(UITheme.COLOR_INK, 2, 8, 10, 8, 10));
         demoBox.add(label("DEMO ACCOUNT", UITheme.FONT_BODY_BOLD, UITheme.COLOR_INK));
-        demoBox.add(label("alice@university.edu / Password123!", UITheme.FONT_SMALL, UITheme.COLOR_INK));
+        demoBox.add(label("alice.j.2025.cse@rajalakshmi.edu.in / Password123!", UITheme.FONT_SMALL, UITheme.COLOR_INK));
         demoBox.add(label("Try Bob after sending a swap request.", UITheme.FONT_SMALL, UITheme.COLOR_INK));
         card.add(demoBox, at(gbc, row));
         return card;
@@ -164,7 +164,7 @@ public class LoginRegisterFrame extends JFrame {
 
         gbc.insets = new Insets(3, 6, 2, 6);
         card.add(label("STUDENT EMAIL", UITheme.FONT_BODY_BOLD, UITheme.COLOR_TEXT_PRIMARY), at(gbc, row++));
-        txtRegEmail = new ModernTextField("e.g. vandhana.m.2025.ece@rajalakshmi.edu.in");
+        txtRegEmail = new ModernTextField("e.g. arjun.k.2025.cse@rajalakshmi.edu.in");
         gbc.insets = new Insets(1, 6, 7, 6);
         card.add(txtRegEmail, at(gbc, row++));
 

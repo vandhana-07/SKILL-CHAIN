@@ -13,7 +13,7 @@ Alice can teach Java and wants to learn Python. Bob can teach Python and wants t
 ## What students can do
 
 - Create an account and manage a personal skill portfolio.
-- Register with the college email structure `name.initial.year.department@rajalakshmi.edu.in`.
+- Register and sign in with the college email structure `name.initial.year.department@rajalakshmi.edu.in`.
 - Add skills to teach or skills to learn, organized by category.
 - Browse the campus directory with confirmed reciprocal matches highlighted first, including the exact skill pair that makes each match two-way.
 - Send learning requests and follow their pending, accepted, or rejected status.
@@ -79,7 +79,7 @@ The app demonstrates create, read, update, and delete operations through registr
 
    On Windows, `run.bat` is also available.
 
-The sample students in `schema.sql` share the classroom password `Password123!`. Use these accounts for demonstration only.
+The sample students in `schema.sql` share the classroom password `Password123!`. For example, Alice Johnson signs in as `alice.j.2025.cse@rajalakshmi.edu.in`. Use sample accounts for demonstration only.
 
 ## Project material
 
